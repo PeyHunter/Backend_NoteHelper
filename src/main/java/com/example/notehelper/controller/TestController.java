@@ -20,7 +20,7 @@ public class TestController {
     }
 
     // MAPPING
-    @GetMapping("/api/check-key")
+    @GetMapping("/check-key")
     public String checkKey() {
         if (apiKey == null || apiKey.isEmpty()) {
             return "❌ API key not loaded";
