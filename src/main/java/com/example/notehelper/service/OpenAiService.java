@@ -26,18 +26,17 @@ public class OpenAiService {
         this.webClient = builder.build();
     }
 
-    public Mono<String> analyseText(String text) {
+    // --- main reusable method ---
+    public Mono<String> analyseText(String prompt, String systemRole) {
 
         Map<String, Object> body = Map.of(
                 "model", model,
                 "messages", List.of(
-                        Map.of("role", "system",
-                                "content", "Du er en hjælpsom tutor, der laver korte noter og nøglebegreber ud fra en given tekst."),
-                        Map.of("role", "user",
-                                "content", text)
+                        Map.of("role", "system", "content", systemRole),
+                        Map.of("role", "user", "content", prompt)
                 ),
-                "max_tokens", 300,
-                "temperature", 0.8
+                "max_tokens", 15000,
+                "temperature", 0.5
         );
 
         return webClient.post()
