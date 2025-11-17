@@ -36,7 +36,7 @@ public class OpenAiService {
                         Map.of("role", "user", "content", prompt)
                 ),
                 "max_tokens", 15000,
-                "temperature", 0.5
+                "temperature", 0.3
         );
 
         return webClient.post()
