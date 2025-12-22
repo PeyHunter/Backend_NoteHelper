@@ -23,13 +23,9 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: "21"       # Skift til den version du bruger (fx 17)
-          distribution: "temurin"  # Standard JDK distribution
+          java-version: "21"
+          distribution: "temurin"
 
-      # Bygger og tester din Spring Boot-applikation
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
-
-      # Dette step vil fejle hvis tests fejler (det er pointen med CI)
+      # Kører tests
       - name: Run tests
         run: mvn test
