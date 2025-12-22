@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - main
-      - dev
   pull_request:
     branches:
       - main
-      - dev
   workflow_dispatch:
 
 jobs:
@@ -16,16 +14,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Henter koden fra dit GitHub-repo
       - uses: actions/checkout@v4
 
-      # Sætter Java op på runneren
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           java-version: "21"
           distribution: "temurin"
 
-      # Kører tests
       - name: Run tests
-        run: mvn test
+        run: mvn -B clean test
