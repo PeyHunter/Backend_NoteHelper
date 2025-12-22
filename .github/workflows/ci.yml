@@ -1,4 +1,4 @@
-name: Node CI
+kname: Java CI
 
 on:
   push:
@@ -14,19 +14,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Henter koden fra dit GitHub-repo
       - uses: actions/checkout@v4
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
+      # Sætter Java op på runneren
+      - name: Set up JDK
+        uses: actions/setup-java@v4
         with:
-          node-version: 20
+          java-version: "21"       # Skift til den version du bruger (fx 17)
+          distribution: "temurin"  # Standard JDK distribution
 
-      - name: Install dependencies
-        run: npm install
+      # Bygger og tester din Spring Boot-applikation
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
 
+      # Dette step vil fejle hvis tests fejler (det er pointen med CI)
       - name: Run tests
-        run: npm test
-
-      # Hvis du vil, kan du også bygge dit projekt her
-      - name: Build
-        run: npm run build
+        run: mvn test
