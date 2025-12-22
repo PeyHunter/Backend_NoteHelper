@@ -1,0 +1,49 @@
+# Navnet på workflowet (bare et label du ser i GitHub Actions fanen)
+name: CI/CD Pipeline
+
+# Hvornår workflowet skal køre — her kører den, når du pusher til main branch
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  # Vi kalder jobbet build-and-deploy (du kan kalde det hvad du vil)
+  build-and-deploy:
+    # Fortæller GitHub Actions, at jobbet skal køre på en virtuel Ubuntu-maskine
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Hent koden fra dit GitHub repository
+      - name: Hent kode fra repo
+        uses: actions/checkout@v4
+
+      # Step 2: Installer Node.js i den virtuelle maskine (så npm kan bruges)
+      - name: Installer Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20" # Her bestemmer du, hvilken Node-version projektet skal køre med
+
+      # Step 3: Installer alle dependencies fra package.json
+      - name: Installer dependencies
+        run: npm install
+
+      # Step 4: Kør dine tests – fx Jest eller Mocha
+      # Hvis en test fejler, stopper hele pipeline her
+      - name: Kør tests
+        run: npm test
+
+      # Step 5: Byg projektet — bruges mest hvis du har et build-step (TypeScript, bundling osv.)
+      # Hvis du har ren Node.js uden build, er det stadig fint at lade den stå, den gør bare ikke noget særligt
+      - name: Build projekt
+        run: npm run build
+
+      # Step 6: Deploy til Render.
+      # Her laver du et API-kald til Render, som fortæller den: “deploy den her service igen”
+      # srv-xxxx skal erstattes med dit Renders “service ID”
+      # RENDER_API_KEY er en secret du gemmer i GitHub (så din nøgle ikke ligger i koden)
+      - name: Deploy til Render
+        run: |
+          curl -X POST \
+          -H "Accept: application/json" \
+          -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+          https://api.render.com/deploy/srv-xxxx
