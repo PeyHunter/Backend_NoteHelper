@@ -14,7 +14,14 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:5173")
+
+@CrossOrigin(origins = {
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://frontend",
+        "http://frontend:80",
+        "http://65.108.56.160"
+})
 public class NoteHelperController {
 
     @Value("${app.api-key}")
@@ -46,13 +53,31 @@ public class NoteHelperController {
         );
     }
 
+
+    // ---------- HELPER ----------
+    private String extractText(MultipartFile file) throws IOException {
+        String name = file.getOriginalFilename().toLowerCase();
+
+        if (name.endsWith(".pdf")) {
+            try (PDDocument doc = PDDocument.load(file.getInputStream())) {
+                return new PDFTextStripper().getText(doc);
+            }
+        } else if (name.endsWith(".txt")) {
+            return new String(file.getBytes());
+        } else {
+            throw new IOException("Unsupported file type. Please upload .txt or .pdf");
+        }
+    }
+
+
+
     // ---------- GENERATE NOTES ----------
     @PostMapping("/generate-notes")
     public Map<String, Object> generateNotes(@RequestBody Map<String, String> body) {
         String text = body.get("text");
 
         String prompt =
-                // --- 🔧 PART 1: MARKDOWN + STRUCTURE RULES ---
+                // --- PART 1: MARKDOWN + STRUCTURE RULES ---
                 "Follow these Markdown structure rules carefully:\n"
                         + "1. Use '### ' for every main heading (for example: ### Introduction to SPAs).\n"
                         + "2. Use long paragraphs after each heading — at least 10–15 sentences.\n"
@@ -63,7 +88,7 @@ public class NoteHelperController {
                         + "6. Do not use bullet points unless absolutely required for clarity.\n"
                         + "7. Keep everything in the same language as the input text.\n\n"
 
-                        // --- 🎓 PART 2: TEACHING STYLE RULES ---
+                        // --- PART 2: TEACHING STYLE RULES ---
                         + "Write as if you are a friendly university lecturer teaching a student who is *completely new* to the subject.\n"
                         + "You must make every idea understandable — walk the student through how things work and how to start using them.\n"
                         + "Your tone should be warm, clear, detailed, and patient. Sound like a human teacher, not a textbook.\n\n"
@@ -75,11 +100,11 @@ public class NoteHelperController {
                         + "- An extra tip or common mistake beginners should know.\n"
                         + "- Optional: Add a short analogy if it helps the explanation (e.g., comparing client-server interaction to restaurant ordering).\n\n"
 
-                        // --- 💬 PART 3: PURPOSE ---
+                        // --- PART 3: PURPOSE ---
                         + "These notes will be used for exam preparation by a student who struggles with theory. "
                         + "Make the notes educational and comprehensive enough that someone could understand the entire topic just by reading them.\n\n"
 
-                        // --- 📘 PART 4: EXAMPLE OUTPUT FORMAT ---
+                        // --- PART 4: EXAMPLE OUTPUT FORMAT ---
                         + "Example format:\n\n"
                         + "### Example Topic Title\n"
                         + "Explain what the concept is, what problem it solves, and how it works internally. "
@@ -93,7 +118,7 @@ public class NoteHelperController {
                         + "### Next Topic Title\n"
                         + "Continue with the same format.\n\n"
 
-                        // --- 📄 PART 5: INPUT CONTENT ---
+                        // --- PART 5: INPUT CONTENT ---
                         + "Now rewrite the following text into complete, beginner-friendly, detailed Markdown notes following all the rules above.\n\n"
                         + text;
 
@@ -176,8 +201,7 @@ public class NoteHelperController {
 
 
 
-
-
+    //Giv AI adgang til det oploadede document, så man kan chatte om det
     @PostMapping("/analyse-with-file")
     public Map<String, Object> analyseWithFile(@RequestBody Map<String, String> body) {
         String fileText = body.get("fileText");
@@ -199,27 +223,8 @@ public class NoteHelperController {
                 "timestamp", LocalDateTime.now().toString()
         );
     }
-
-
-
-
-    // ---------- HELPER ----------
-    private String extractText(MultipartFile file) throws IOException {
-        String name = file.getOriginalFilename().toLowerCase();
-
-        if (name.endsWith(".pdf")) {
-            try (PDDocument doc = PDDocument.load(file.getInputStream())) {
-                return new PDFTextStripper().getText(doc);
-            }
-        } else if (name.endsWith(".txt")) {
-            return new String(file.getBytes());
-        } else {
-            throw new IOException("Unsupported file type. Please upload .txt or .pdf");
-        }
-    }
-
-
-
+    
+//SKAL JEG BRUGE OPENROUTER - Througput - safeguard?
 
     // ---------- CHECK ----------
     @GetMapping("/check-key")

@@ -1,4 +1,4 @@
-kname: CD - Build and Push Docker Image
+name: CD - Build and Push Docker Image
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/peyhunter/backend_notehelper:latest ./Backend-Notehelper
+          docker build -t ghcr.io/peyhunter/backend_notehelper:latest .
 
       - name: Push Docker image
         run: |

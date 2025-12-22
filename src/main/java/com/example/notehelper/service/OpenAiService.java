@@ -8,6 +8,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Map;
 
+
 @Service
 public class OpenAiService {
 
@@ -22,11 +23,13 @@ public class OpenAiService {
     @Value("${app.model}")
     private String model;
 
+    //
     public OpenAiService(WebClient.Builder builder) {
         this.webClient = builder.build();
     }
 
-    // --- main reusable method ---
+
+    //Modtager min prompt + hvilken rolle den skal påtage sig
     public Mono<String> analyseText(String prompt, String systemRole) {
 
         Map<String, Object> body = Map.of(
@@ -57,6 +60,35 @@ public class OpenAiService {
                         return "Fejl i svar: " + e.getMessage();
                     }
                 });
+    }
+
+    public Mono<String> analyseMultipleSections(String text, String systemRole) {
+
+        // Her opdeler vi prompten i tre dele, så OpenAI kan svare hurtigere parallelt
+        String introPrompt =
+                "Lav et kort introduktionsafsnit ud fra denne tekst:\n" + text;
+
+        String examplesPrompt =
+                "Lav nogle illustrative eller tekniske eksempler ud fra denne tekst:\n" + text;
+
+        String howToPrompt =
+                "Forklar hvordan man kommer i gang eller kan bruge emnet i praksis:\n" + text;
+
+        // Mono.zip samler tre asynkrone kald, så de kører samtidig
+        return Mono.zip(
+                analyseText(introPrompt, systemRole),
+                analyseText(examplesPrompt, systemRole),
+                analyseText(howToPrompt, systemRole)
+        ).map(tuple -> {
+            String intro = tuple.getT1();
+            String examples = tuple.getT2();
+            String howTo = tuple.getT3();
+
+            // Vi samler de tre resultater som én samlet markdown-tekst
+            return "# Introduktion\n" + intro + "\n\n" +
+                    "## Eksempler\n" + examples + "\n\n" +
+                    "## Kom i gang\n" + howTo;
+        });
     }
 
 }
