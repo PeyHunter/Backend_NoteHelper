@@ -1,47 +1,32 @@
-# Navnet på workflowet - bare et label, du ser inde i GitHub Actions
-name: CI/CD Pipeline
+name: Node CI
 
-# Hvornår workflowet skal køre.
-# Her kører den hver gang du pusher til main branch.
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  # Et job er en samling trin, som kører i rækkefølge
-  build-and-deploy:
-    # Dette fortæller GitHub, at jobbet skal køre på en virtuel Ubuntu maskine
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Hent din kode fra GitHub repoet
-      - name: Hent kode fra repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # Step 2: Installer Node.js, så npm kan bruges i de næste trin
-      - name: Installer Node
+      - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20" # Din Node-version
+          node-version: 20
 
-      # Step 3: Installer alle dependencies fra package.json
-      - name: Installer dependencies
+      - name: Install dependencies
         run: npm install
 
-      # Step 4: Kør tests - fx Jest eller Mocha
-      - name: Kør tests
+      - name: Run tests
         run: npm test
 
-      # Step 5: Byg projektet (kan være tom kommando for ren Node.js)
-      - name: Build projekt
+      # Hvis du vil, kan du også bygge dit projekt her
+      - name: Build
         run: npm run build
-
-      # Step 6: Deploy til Render
-      # Sørg for at du har din Render API nøgle gemt som secret i GitHub under navnet RENDER_API_KEY
-      # Og erstat srv-xxxx med dit eget Service ID fra Render
-      - name: Deploy til Render
-        run: |
-          curl -X POST \
-          -H "Accept: application/json" \
-          -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-          https://api.render.com/deploy/srv-xxxx
