@@ -1,46 +1,44 @@
-# Navnet på workflowet (bare et label du ser i GitHub Actions fanen)
+# Navnet på workflowet - bare et label, du ser inde i GitHub Actions
 name: CI/CD Pipeline
 
-# Hvornår workflowet skal køre — her kører den, når du pusher til main branch
+# Hvornår workflowet skal køre.
+# Her kører den hver gang du pusher til main branch.
 on:
   push:
     branches: ["main"]
 
 jobs:
-  # Vi kalder jobbet build-and-deploy (du kan kalde det hvad du vil)
+  # Et job er en samling trin, som kører i rækkefølge
   build-and-deploy:
-    # Fortæller GitHub Actions, at jobbet skal køre på en virtuel Ubuntu-maskine
+    # Dette fortæller GitHub, at jobbet skal køre på en virtuel Ubuntu maskine
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Hent koden fra dit GitHub repository
+      # Step 1: Hent din kode fra GitHub repoet
       - name: Hent kode fra repo
         uses: actions/checkout@v4
 
-      # Step 2: Installer Node.js i den virtuelle maskine (så npm kan bruges)
+      # Step 2: Installer Node.js, så npm kan bruges i de næste trin
       - name: Installer Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20" # Her bestemmer du, hvilken Node-version projektet skal køre med
+          node-version: "20" # Din Node-version
 
       # Step 3: Installer alle dependencies fra package.json
       - name: Installer dependencies
         run: npm install
 
-      # Step 4: Kør dine tests – fx Jest eller Mocha
-      # Hvis en test fejler, stopper hele pipeline her
+      # Step 4: Kør tests - fx Jest eller Mocha
       - name: Kør tests
         run: npm test
 
-      # Step 5: Byg projektet — bruges mest hvis du har et build-step (TypeScript, bundling osv.)
-      # Hvis du har ren Node.js uden build, er det stadig fint at lade den stå, den gør bare ikke noget særligt
+      # Step 5: Byg projektet (kan være tom kommando for ren Node.js)
       - name: Build projekt
         run: npm run build
 
-      # Step 6: Deploy til Render.
-      # Her laver du et API-kald til Render, som fortæller den: “deploy den her service igen”
-      # srv-xxxx skal erstattes med dit Renders “service ID”
-      # RENDER_API_KEY er en secret du gemmer i GitHub (så din nøgle ikke ligger i koden)
+      # Step 6: Deploy til Render
+      # Sørg for at du har din Render API nøgle gemt som secret i GitHub under navnet RENDER_API_KEY
+      # Og erstat srv-xxxx med dit eget Service ID fra Render
       - name: Deploy til Render
         run: |
           curl -X POST \
