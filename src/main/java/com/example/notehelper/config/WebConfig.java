@@ -18,8 +18,8 @@ public class WebConfig {
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
                 "http://localhost:3000",
-                "http://frontend",
-                "http://frontend:80"
+                "https://ai.peytonhunter.com",
+                "https://peytonhunter.com"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));

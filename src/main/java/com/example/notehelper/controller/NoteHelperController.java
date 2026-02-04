@@ -18,7 +18,7 @@ import java.util.Map;
         "http://localhost:5173",
         "http://localhost:3000",
         "https://peytonhunter.com",
-        "https://ai.peytonhunter.com"    
+        "https://ai.peytonhunter.com"
 })
 public class NoteHelperController {
 
