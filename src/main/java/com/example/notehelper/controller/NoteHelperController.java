@@ -14,13 +14,11 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-
 @CrossOrigin(origins = {
         "http://localhost:5173",
         "http://localhost:3000",
-        "http://frontend",
-        "http://frontend:80",
-        "http://65.108.56.160"
+        "https://peytonhunter.com",
+        "https://ai.peytonhunter.com"    
 })
 public class NoteHelperController {
 
