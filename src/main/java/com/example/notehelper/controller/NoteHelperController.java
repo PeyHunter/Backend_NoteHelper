@@ -13,13 +13,6 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
-@CrossOrigin(origins = {
-        "http://localhost:5173",
-        "http://localhost:3000",
-        "https://peytonhunter.com",
-        "https://ai.peytonhunter.com"
-})
 public class NoteHelperController {
 
     @Value("${app.api-key}")
@@ -33,7 +26,7 @@ public class NoteHelperController {
 
 
 
-    @PostMapping("/upload")
+    @PostMapping("api/upload")
     public Map<String, Object> upload(@RequestParam("file") MultipartFile file) throws IOException {
         String text = extractText(file);
 
@@ -70,7 +63,7 @@ public class NoteHelperController {
 
 
     // ---------- GENERATE NOTES ----------
-    @PostMapping("/generate-notes")
+    @PostMapping("api/generate-notes")
     public Map<String, Object> generateNotes(@RequestBody Map<String, String> body) {
         String text = body.get("text");
 
@@ -134,7 +127,7 @@ public class NoteHelperController {
         );
     }
 
-    @PostMapping("/explain-more")
+    @PostMapping("api/explain-more")
     public Map<String, Object> explainMore(@RequestBody Map<String, String> body) {
         String text = body.get("text");
 
@@ -160,7 +153,7 @@ public class NoteHelperController {
         );
     }
 
-    @PostMapping("/generate-quiz")
+    @PostMapping("api/generate-quiz")
     public Map<String, Object> generateQuiz(@RequestBody Map<String, Object> body) {
         String text = (String) body.get("text");
         Integer amount = body.containsKey("amount") ? (Integer) body.get("amount") : 10;
@@ -200,7 +193,7 @@ public class NoteHelperController {
 
 
     //Giv AI adgang til det oploadede document, så man kan chatte om det
-    @PostMapping("/analyse-with-file")
+    @PostMapping("api/analyse-with-file")
     public Map<String, Object> analyseWithFile(@RequestBody Map<String, String> body) {
         String fileText = body.get("fileText");
         String question = body.get("question");
@@ -225,7 +218,7 @@ public class NoteHelperController {
 //SKAL JEG BRUGE OPENROUTER - Througput - safeguard?
 
     // ---------- CHECK ----------
-    @GetMapping("/check-key")
+    @GetMapping("api/check-key")
     public String checkKey() {
         if (apiKey == null || apiKey.isEmpty())
         {
